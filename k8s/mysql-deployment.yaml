@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tienda-comidas-db
+  namespace: tienda-comidas
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tienda-comidas-db
+  template:
+    metadata:
+      labels:
+        app: tienda-comidas-db
+    spec:
+      containers:
+        - name: mysql
+          image: 542081623405.dkr.ecr.us-east-1.amazonaws.com/tienda-comidas-db:eks-v1 # Colocar uri de tu imagen en ECR
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_ROOT_PASSWORD
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: data
+          emptyDir: {}
